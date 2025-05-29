@@ -1,0 +1,6 @@
+.markdown {
+  li {
+    list-style-type: square;
+    word-break: break-word;
+  }
+}
