@@ -14,6 +14,7 @@ export default async function DefaultLayout({
   const { locale } = await params;
   const page = await getLandingPage(locale);
 
+
   return (
     <>
       {page.header && <Header header={page.header} />}
