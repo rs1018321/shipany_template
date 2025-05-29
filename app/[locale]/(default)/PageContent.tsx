@@ -280,230 +280,94 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
 
   return (
     <>
-      {page.hero && <Hero hero={page.hero} />}
-      {page.branding && <Branding section={page.branding} />}
-      {page.introduce && <Feature1 section={page.introduce} />}
-      {page.benefit && <Feature2 section={page.benefit} />}
-      {page.usage && <Feature3 section={page.usage} />}
-      {page.feature && <Feature section={page.feature} />}
-      {page.showcase && <Showcase section={page.showcase} />}
-      {page.stats && <Stats section={page.stats} />}
-      
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-            🎨 魔法涂色本
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">将你的照片变成有趣的涂色线稿图，让创意无限绽放！</p>
-        </div>
+       {/* ✅ 功能区域提到页面顶部 Hero 下方 */}
+       {page.hero && <Hero hero={page.hero} />}
 
-        {/* Main Content */}
-        <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-          {/* Left Panel - Upload */}
-          <Card className="p-8 bg-white/80 backdrop-blur-sm border-2 border-blue-100 shadow-xl">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-              <Upload className="w-6 h-6 text-blue-500" />
-              上传图片
-            </h2>
+<div className="relative z-10 -mt-12 pb-8 px-4">
+  <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-32">
 
-            <div
-              onClick={triggerFileInput}
-              className="border-3 border-dashed border-blue-300 rounded-2xl p-12 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/50 transition-all duration-300"
-            >
-              {originalImage ? (
-                <div className="space-y-4">
-                  <img
-                    src={originalImage || "/placeholder.svg"}
-                    alt="上传的图片"
-                    className="max-w-full max-h-64 mx-auto rounded-xl shadow-lg"
-                  />
-                  <p className="text-blue-600 font-medium">点击更换图片</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="w-16 h-16 mx-auto bg-blue-100 rounded-full flex items-center justify-center">
-                    <Upload className="w-8 h-8 text-blue-500" />
-                  </div>
-                  <div>
-                    <p className="text-lg font-medium text-gray-700">点击上传图片</p>
-                    <p className="text-sm text-gray-500 mt-2">支持 JPG、PNG 格式，最大 5MB</p>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-
-            <Button
-              onClick={generateColoringBook}
-              disabled={!originalImage || isGenerating}
-              className="w-full mt-6 h-14 text-lg font-semibold bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-            >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                  魔法生成中...
-                </>
-              ) : (
-                <>
-                  <Wand2 className="w-5 h-5 mr-2" />
-                  生成涂色图
-                </>
-              )}
-            </Button>
-          </Card>
-
-          {/* Right Panel - Result */}
-          <Card className="p-8 bg-white/80 backdrop-blur-sm border-2 border-purple-100 shadow-xl">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-              <Wand2 className="w-6 h-6 text-purple-500" />
-              涂色线稿图
-            </h2>
-
-            <div className="border-3 border-dashed border-purple-300 rounded-2xl p-12 text-center min-h-[300px] flex items-center justify-center">
-              {generatedImage ? (
-                <div className="space-y-4 w-full">
-                  <img
-                    src={generatedImage || "/placeholder.svg"}
-                    alt="生成的涂色图"
-                    className="max-w-full max-h-64 mx-auto rounded-xl shadow-lg"
-                  />
-                  <Button
-                    onClick={downloadImage}
-                    className="bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white font-medium px-6 py-2"
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    下载图片
-                  </Button>
-                </div>
-              ) : (
-                <div className="text-center">
-                  <div className="w-16 h-16 mx-auto bg-purple-100 rounded-full flex items-center justify-center mb-4">
-                    <Wand2 className="w-8 h-8 text-purple-500" />
-                  </div>
-                  <p className="text-lg font-medium text-gray-700">涂色图将在这里显示</p>
-                  <p className="text-sm text-gray-500 mt-2">上传图片并点击生成按钮</p>
-                </div>
-              )}
-            </div>
-          </Card>
-        </div>
-
-        {/* Debug Info */}
-        {debugInfo && (
-          <Card className="max-w-4xl mx-auto mt-6 p-4 bg-gray-50 border-gray-200">
-            <h3 className="font-medium text-gray-700 mb-2">调试信息:</h3>
-            <p className="text-sm text-gray-600 font-mono whitespace-pre-wrap">{debugInfo}</p>
-          </Card>
-        )}
-
-        {/* Detailed Error Info */}
-        {error && (
-          <Card className="max-w-4xl mx-auto mt-4 p-4 bg-red-50 border-red-200">
-            <h3 className="font-medium text-red-700 mb-2">详细错误信息:</h3>
-            <div className="text-sm text-red-600 space-y-2">
-              <p>
-                <strong>错误:</strong> {error}
-              </p>
-              <details className="mt-2">
-                <summary className="cursor-pointer font-medium">查看技术详情</summary>
-                <pre className="mt-2 p-2 bg-red-100 rounded text-xs overflow-auto max-h-40">
-                  {JSON.stringify({ error, timestamp: new Date().toISOString() }, null, 2)}
-                </pre>
-              </details>
-            </div>
-          </Card>
-        )}
-
-        {/* Features */}
-        <div className="max-w-4xl mx-auto mt-16">
-          <h2 className="text-3xl font-bold text-center text-gray-800 mb-8">✨ 特色功能</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            <Card className="p-6 text-center bg-white/60 backdrop-blur-sm border-blue-100">
-              <div className="w-12 h-12 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                <Wand2 className="w-6 h-6 text-blue-500" />
-              </div>
-              <h3 className="font-bold text-gray-800 mb-2">AI智能转换</h3>
-              <p className="text-gray-600 text-sm">使用先进的AI技术，将任何照片转换为精美的线稿图</p>
-            </Card>
-            <Card className="p-6 text-center bg-white/60 backdrop-blur-sm border-purple-100">
-              <div className="w-12 h-12 mx-auto bg-purple-100 rounded-full flex items-center justify-center mb-4">
-                <Download className="w-6 h-6 text-purple-500" />
-              </div>
-              <h3 className="font-bold text-gray-800 mb-2">高清下载</h3>
-              <p className="text-gray-600 text-sm">生成的涂色图支持高清下载，打印效果清晰</p>
-            </Card>
-            <Card className="p-6 text-center bg-white/60 backdrop-blur-sm border-green-100">
-              <div className="w-12 h-12 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-4">
-                <Upload className="w-6 h-6 text-green-500" />
-              </div>
-              <h3 className="font-bold text-gray-800 mb-2">简单易用</h3>
-              <p className="text-gray-600 text-sm">只需上传图片，一键生成，操作简单快捷</p>
-            </Card>
-          </div>
-        </div>
-
-        <Card className="p-8 bg-white/80 backdrop-blur-sm border-2 border-green-100 shadow-xl max-w-2xl mx-auto mb-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-            <Wand2 className="w-6 h-6 text-green-500" />
-            文字描述生成线稿
-          </h2>
-          <Textarea
-            value={promptText}
-            onChange={(e) => setPromptText(e.target.value)}
-            placeholder="请输入图片描述，例如：一只在森林中漫步的小鹿"
-          />
-          <Button
-            onClick={generateFromText}
-            disabled={!promptText.trim() || isGeneratingText}
-            className="w-full mt-4 h-12 text-lg font-semibold bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
-          >
-            {isGeneratingText ? (
-              <>
-                <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                生成中...
-              </>
-            ) : (
-              <>
-                <Wand2 className="w-5 h-5 mr-2" />
-                生成线稿
-              </>
-            )}
-          </Button>
-          {textError && <p className="text-red-600 mt-2">{textError}</p>}
-          {textGeneratedImage && (
-            <div className="mt-6 text-center">
-              <img
-                src={textGeneratedImage}
-                alt="生成的线稿图"
-                className="max-w-full max-h-64 mx-auto rounded-xl shadow-lg"
-              />
-              <Button
-                onClick={() => {
-                  const link = document.createElement("a")
-                  link.href = textGeneratedImage
-                  link.download = `text-sketch-${Date.now()}.png`
-                  document.body.appendChild(link)
-                  link.click()
-                  document.body.removeChild(link)
-                }}
-                className="mt-4 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white font-medium px-6 py-2"
-              >
-                <Download className="w-4 h-4 mr-2" />
-                下载图片
-              </Button>
-            </div>
+    {/* 🎨 图生图区域 */}
+    <div className="flex flex-col items-center h-full">
+      <h3 className="inline-flex items-center justify-center bg-primary text-primary-foreground rounded-md text-sm font-medium h-10 px-4 mb-4">将图片转换为填色页</h3>
+      <Card className="flex flex-col flex-1 w-full p-6 bg-white/90 shadow-xl border rounded-2xl">
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <Upload className="w-5 h-5 text-blue-600" /> 上传图片生成线稿图
+        </h2>
+        <div
+          onClick={triggerFileInput}
+          className="border-2 border-dashed border-blue-300 rounded-lg w-full aspect-[5/4] overflow-hidden flex items-center justify-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition"
+        >
+          {originalImage ? (
+            <img src={originalImage} alt="上传" className="w-full h-full object-contain" />
+          ) : (
+            <p className="text-gray-500">点击上传图片</p>
           )}
-        </Card>
-      </div>
+        </div>
+        <input ref={fileInputRef} type="file" onChange={handleImageUpload} className="hidden" />
+        <Button onClick={generateColoringBook} disabled={!originalImage || isGenerating} className="w-full mt-4">
+          {isGenerating ? (
+            <><Loader2 className="w-4 h-4 animate-spin mr-2" />生成中...</>
+          ) : (
+            <><Wand2 className="w-4 h-4 mr-2" />生成涂色图</>
+          )}
+        </Button>
+        {generatedImage && (
+          <div className="mt-4 text-center">
+            <img src={generatedImage} alt="线稿" className="rounded-lg shadow max-h-64 mx-auto" />
+            <Button onClick={downloadImage} className="mt-2 w-full">下载图片</Button>
+          </div>
+        )}
+      </Card>
     </div>
-      
-      {page.pricing && <Pricing pricing={page.pricing} />}
-      {page.testimonial && <Testimonial section={page.testimonial} />}
-      {page.faq && <FAQ section={page.faq} />}
-      {page.cta && <CTA section={page.cta} />}
+
+    {/* ✏️ 文生图区域 */}
+    <div className="flex flex-col items-center h-full">
+      <h3 className="inline-flex items-center justify-center bg-primary text-primary-foreground rounded-md text-sm font-medium h-10 px-4 mb-4">转换文字为填色书</h3>
+      <Card className="flex flex-col flex-1 w-full p-6 bg-white/90 shadow-xl border rounded-2xl">
+        <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+          <Wand2 className="w-5 h-5 text-green-600" /> 文字描述生成线稿图
+        </h2>
+        <Textarea
+          value={promptText}
+          onChange={(e) => setPromptText(e.target.value)}
+          placeholder="例如：一个在海滩玩耍的小孩"
+          className="mb-4 w-full aspect-[5/4]"
+        />
+        <Button onClick={generateFromText} disabled={!promptText.trim() || isGeneratingText} className="w-full">
+          {isGeneratingText ? (
+            <><Loader2 className="w-4 h-4 animate-spin mr-2" />生成中...</>
+          ) : (
+            <><Wand2 className="w-4 h-4 mr-2" />生成线稿图</>
+          )}
+        </Button>
+        {textGeneratedImage && (
+          <div className="mt-4 text-center">
+            <img src={textGeneratedImage} alt="线稿图" className="rounded-lg shadow max-h-64 mx-auto" />
+            <Button onClick={() => {
+              const link = document.createElement("a")
+              link.href = textGeneratedImage
+              link.download = `text-sketch-${Date.now()}.png`
+              link.click()
+            }} className="mt-2 w-full">下载图片</Button>
+          </div>
+        )}
+      </Card>
+    </div>
+  </div>
+</div>
+
+{/* 原本内容继续渲染 */}
+{page.branding && <Branding section={page.branding} />}
+{page.introduce && <Feature1 section={page.introduce} />}
+{page.benefit && <Feature2 section={page.benefit} />}
+{page.usage && <Feature3 section={page.usage} />}
+{page.feature && <Feature section={page.feature} />}
+{page.showcase && <Showcase section={page.showcase} />}
+{page.stats && <Stats section={page.stats} />}
+{page.pricing && <Pricing pricing={page.pricing} />}
+{page.testimonial && <Testimonial section={page.testimonial} />}
+{page.faq && <FAQ section={page.faq} />}
+{page.cta && <CTA section={page.cta} />}
     </>
   );
 }
