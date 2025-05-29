@@ -1,14 +1,14 @@
 {
-  "template": "shipany-template-one",
+  "template": "coloring-page-generator",
   "theme": "light",
   "header": {
     "brand": {
-      "title": "ShipAny",
+      "title": "Mimi Panda",
       "logo": {
-        "src": "/logo.png",
-        "alt": "ShipAny"
+        "src": "/imgs/logo.png",
+        "alt": "Mimi Panda"
       },
-      "url": "/zh"
+      "url": "https://mimi-panda.com/zh"
     },
     "nav": {
       "items": [
@@ -47,9 +47,9 @@
     },
     "buttons": [
       {
-        "title": "获取 ShipAny",
-        "url": "https://shipany.ai",
-        "target": "_blank",
+        "title": "免费试用",
+        "url": "/#feature",
+        "target": "_self",
         "variant": "link",
         "icon": "RiArrowRightUpLine"
       }
@@ -59,27 +59,27 @@
     "show_locale": true
   },
   "hero": {
-    "title": "几小时内快速构建 AI 创业项目，而不是几天",
-    "highlight_text": "快速构建",
-    "description": "ShipAny 是一个用于构建 AI SaaS 创业项目的 NextJS 模板。<br/>通过丰富的模板和组件快速启动。",
+    "title": "几秒钟内创建可打印的填色页",
+    "highlight_text": "AI 填色页生成器",
+    "description": "使用 AI 将您的照片或文字瞬间转换成可打印的填色页。",
     "announcement": {
       "label": "2025",
       "title": "🎉 新年快乐",
       "url": "/#pricing"
     },
-    "tip": "🎁 2025年前五折优惠",
+    "tip": "免费且易于使用 — 无需注册",
     "buttons": [
       {
-        "title": "立即开始",
+        "title": "免费试用",
         "icon": "RiFlashlightFill",
-        "url": "/#pricing",
+        "url": "/#feature",
         "target": "_self",
         "variant": "default"
       },
       {
-        "title": "加入 Discord",
+        "title": "了解更多",
         "icon": "RiDiscordFill",
-        "url": "https://discord.gg/HQNnrzjZQS",
+        "url": "https://mimi-panda.com/zh",
         "target": "_blank",
         "variant": "outline"
       }
@@ -88,7 +88,7 @@
     "show_badge": false
   },
   "branding": {
-    "title": "ShipAny 建立在巨人的肩膀上",
+    "title": "由 OpenAI、Next.js 和 TailwindCSS 驱动",
     "items": [
       {
         "title": "Next.js",
@@ -129,9 +129,9 @@
   },
   "introduce": {
     "name": "introduce",
-    "title": "什么是 ShipAny",
-    "label": "介绍",
-    "description": "ShipAny 是一个用于构建 AI SaaS 创业项目的 NextJS 模板，内置多种模板和组件。",
+    "title": "什么是 AI 填色页生成器",
+    "label": "关于",
+    "description": "我们的 AI 工具可将您的照片和文本提示转换为高质量的线稿填色页，随时可打印和填色。",
     "image": {
       "src": "/imgs/features/1.png"
     },
@@ -155,9 +155,9 @@
   },
   "benefit": {
     "name": "benefit",
-    "title": "为什么选择 ShipAny",
+    "title": "为什么使用我们的填色页生成器",
     "label": "优势",
-    "description": "获取启动 AI 创业所需的一切 - 从即用型模板到技术支持。",
+    "description": "轻松从您的图像或文本描述生成自定义填色页。",
     "items": [
       {
         "title": "完整框架",
@@ -187,8 +187,8 @@
   },
   "usage": {
     "name": "usage",
-    "title": "如何使用 ShipAny 启动项目",
-    "description": "通过三个简单步骤启动您的 AI SaaS 创业项目：",
+    "title": "如何创建填色页",
+    "description": "通过三步轻松生成填色页：",
     "image": {
       "src": "/imgs/features/1.png"
     },
@@ -227,8 +227,8 @@
   },
   "feature": {
     "name": "feature",
-    "title": "ShipAny 核心功能",
-    "description": "快速高效启动 AI SaaS 创业所需的一切。",
+    "title": "生成器核心功能",
+    "description": "强大的 AI 工具，实现无缝填色页生成。",
     "items": [
       {
         "title": "Next.js 模板",
@@ -264,8 +264,8 @@
   },
   "showcase": {
     "name": "showcase",
-    "title": "使用 ShipAny 构建的 AI SaaS 创业项目",
-    "description": "易于使用，快速发布。",
+    "title": "探索 AI 生成的填色页",
+    "description": "发现用户创作的精彩案例。",
     "items": [
       {
         "title": "ThinkAny",
@@ -353,8 +353,8 @@
   "stats": {
     "name": "stats",
     "label": "统计",
-    "title": "用户喜爱 ShipAny",
-    "description": "因为它易于使用且快速发布。",
+    "title": "深受填色爱好者喜爱",
+    "description": "加入数千名生成 AI 填色页的用户。",
     "icon": "FaRegHeart",
     "items": [
       {
@@ -378,7 +378,7 @@
     "name": "pricing",
     "label": "定价",
     "title": "定价",
-    "description": "获取 ShipAny 的所有功能，快速启动您的 AI SaaS 创业项目。",
+    "description": "选择套餐，解锁高级填色页生成功能。",
     "groups": [],
     "items": [
       {
@@ -404,7 +404,7 @@
         "is_featured": false,
         "tip": "一次付费，无限项目！",
         "button": {
-          "title": "获取 ShipAny",
+          "title": "选择套餐",
           "url": "/#pricing",
           "icon": "RiFlashlightFill"
         },
@@ -438,7 +438,7 @@
         "is_featured": true,
         "tip": "一次付费，无限项目！",
         "button": {
-          "title": "获取 ShipAny",
+          "title": "选择套餐",
           "url": "/#pricing",
           "icon": "RiFlashlightFill"
         },
@@ -470,7 +470,7 @@
         "is_featured": false,
         "tip": "一次付费，无限项目！",
         "button": {
-          "title": "获取 ShipAny",
+          "title": "选择套餐",
           "url": "/#pricing",
           "icon": "RiFlashlightFill"
         },
@@ -484,8 +484,8 @@
   "testimonial": {
     "name": "testimonial",
     "label": "用户评价",
-    "title": "用户如何评价 ShipAny",
-    "description": "听听使用 ShipAny 启动 AI 创业项目的开发者和创始人怎么说。",
+    "title": "用户对我们的 AI 生成器怎么说",
+    "description": "听听用户如何创作独特的填色页。",
     "icon": "GoThumbsup",
     "items": [
       {
@@ -541,49 +541,37 @@
   "faq": {
     "name": "faq",
     "label": "常见问题",
-    "title": "关于 ShipAny 的常见问题",
+    "title": "常见问题",
     "description": "还有其他问题？通过 Discord 或电子邮件联系我们。",
     "items": [
       {
-        "title": "ShipAny 究竟是什么，它是如何工作的？",
-        "description": "ShipAny 是一个专门为构建 AI SaaS 创业项目设计的综合性 NextJS 模板。它提供即用型模板、基础设施设置和部署工具，帮助您在几小时内而不是几天内启动 AI 业务。"
+        "title": "什么是 AI 填色页生成器？",
+        "description": "我们的工具可将照片和文本提示转换为可打印的填色页。"
       },
       {
-        "title": "使用 ShipAny 需要高级技术技能吗？",
-        "description": "虽然基本的编程知识会有帮助，但 ShipAny 设计得非常开发者友好。我们的模板和文档使您即使不是 AI 或云基础设施专家也能轻松入门。"
+        "title": "我可以上传哪些文件格式？",
+        "description": "上传最大 5MB 的 JPEG 或 PNG 图片以创建填色页。"
       },
       {
-        "title": "我可以用 ShipAny 构建什么类型的 AI SaaS？",
-        "description": "ShipAny 支持广泛的 AI 应用，从内容生成到数据分析工具。我们的模板涵盖流行用例，如 AI 聊天机器人、内容生成器、图像处理应用等。"
-      },
-      {
-        "title": "使用 ShipAny 通常需要多长时间才能启动？",
-        "description": "使用 ShipAny，您可以在几小时内完成工作原型，并在几小时内完成生产就绪的应用。我们的一键部署和预配置基础设施显著缩短了传统的数月开发周期。"
-      },
-      {
-        "title": "ShipAny 的基础设施包括什么？",
-        "description": "ShipAny 提供完整的基础设施栈，包括身份验证、数据库设置、API 集成、支付处理和可扩展的云部署。一切都按照行业最佳实践预先配置。"
-      },
-      {
-        "title": "我可以自定义模板以匹配我的品牌吗？",
-        "description": "当然可以！所有 ShipAny 模板都完全可定制。您可以修改设计、功能和功能性以匹配您的品牌标识和特定业务需求，同时保持强大的底层基础设施。"
+        "title": "使用是否免费？",
+        "description": "基础功能免费，高级套餐可解锁更高分辨率和批量处理。"
       }
     ]
   },
   "cta": {
     "name": "cta",
-    "title": "启动您的第一个 AI SaaS 创业项目",
-    "description": "从这里开始，使用 ShipAny 启动。",
+    "title": "开始生成填色页",
+    "description": "立即使用 AI 创建您的第一个填色页。",
     "buttons": [
       {
-        "title": "获取 ShipAny",
-        "url": "https://shipany.ai",
+        "title": "生成填色页",
+        "url": "/#feature",
         "target": "_blank",
         "icon": "GoArrowUpRight"
       },
       {
-        "title": "阅读文档",
-        "url": "https://docs.shipany.ai",
+        "title": "查看示例",
+        "url": "/#showcase",
         "target": "_blank",
         "variant": "outline"
       }
@@ -592,15 +580,15 @@
   "footer": {
     "name": "footer",
     "brand": {
-      "title": "ShipAny",
-      "description": "ShipAny 是一个用于构建 AI SaaS 创业项目的 NextJS 模板。通过丰富的模板和组件快速启动。",
+      "title": "Mimi Panda",
+      "description": "使用 AI 从您的照片和文本创建独特的填色页。",
       "logo": {
-        "src": "/logo.png",
-        "alt": "ShipAny"
+        "src": "/imgs/logo.png",
+        "alt": "Mimi Panda"
       },
-      "url": "/"
+      "url": "https://mimi-panda.com/zh"
     },
-    "copyright": "© 2025 • ShipAny 保留所有权利。",
+    "copyright": "© 2025 • Mimi Panda 保留所有权利。",
     "nav": {
       "items": [
         {

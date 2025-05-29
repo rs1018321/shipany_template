@@ -1,14 +1,14 @@
 {
-  "template": "shipany-template-one",
+  "template": "coloring-page-generator",
   "theme": "light",
   "header": {
     "brand": {
-      "title": "ShipAny",
+      "title": "Mimi Panda",
       "logo": {
-        "src": "/logo.png",
-        "alt": "ShipAny"
+        "src": "/imgs/logo.png",
+        "alt": "Mimi Panda"
       },
-      "url": "/"
+      "url": "https://mimi-panda.com/"
     },
     "nav": {
       "items": [
@@ -47,9 +47,9 @@
     },
     "buttons": [
       {
-        "title": "Get ShipAny",
-        "url": "https://shipany.ai",
-        "target": "_blank",
+        "title": "Try It Free",
+        "url": "/#feature",
+        "target": "_self",
         "variant": "link",
         "icon": "RiArrowRightUpLine"
       }
@@ -59,27 +59,27 @@
     "show_locale": true
   },
   "hero": {
-    "title": "Ship Any AI Startups in hours, not days",
-    "highlight_text": "Ship Any",
-    "description": "ShipAny is a NextJS boilerplate for building AI SaaS startups.<br/>Ship Fast with a variety of templates and components.",
+    "title": "Create Printable Coloring Pages in Seconds",
+    "highlight_text": "AI Coloring Page Generator",
+    "description": "Turn your photos or text into beautiful, printable coloring pages instantly with AI.",
     "announcement": {
       "label": "2025",
       "title": "🎉 Happy New Year",
       "url": "/#pricing"
     },
-    "tip": "🎁 50% off before 2025",
+    "tip": "Free and easy to use — no signup required",
     "buttons": [
       {
-        "title": "Get Started",
+        "title": "Try It Free",
         "icon": "RiFlashlightFill",
-        "url": "/#pricing",
+        "url": "/#feature",
         "target": "_self",
         "variant": "default"
       },
       {
-        "title": "Join Discord",
+        "title": "Learn More",
         "icon": "RiDiscordFill",
-        "url": "https://discord.gg/HQNnrzjZQS",
+        "url": "https://mimi-panda.com/",
         "target": "_blank",
         "variant": "outline"
       }
@@ -88,7 +88,7 @@
     "show_badge": false
   },
   "branding": {
-    "title": "ShipAny is built on the shoulders of giants",
+    "title": "Powered by OpenAI, Next.js, and TailwindCSS",
     "items": [
       {
         "title": "Next.js",
@@ -129,9 +129,9 @@
   },
   "introduce": {
     "name": "introduce",
-    "title": "What is ShipAny",
-    "label": "Introduce",
-    "description": "ShipAny is a NextJS boilerplate for building AI SaaS startups. Built in a variety of templates and components.",
+    "title": "What is AI Coloring Page Generator",
+    "label": "About",
+    "description": "Our AI-powered tool transforms your photos and text prompts into high-quality line art coloring pages, ready to print and color.",
     "image": {
       "src": "/imgs/features/1.png"
     },
@@ -155,9 +155,9 @@
   },
   "benefit": {
     "name": "benefit",
-    "title": "Why Choose ShipAny",
+    "title": "Why Use Our Coloring Page Generator",
     "label": "Benefits",
-    "description": "Get everything you need to launch your AI startup - from ready-to-use templates to technical support.",
+    "description": "Easily generate custom coloring pages from your own images or text descriptions.",
     "items": [
       {
         "title": "Complete Framework",
@@ -187,8 +187,8 @@
   },
   "usage": {
     "name": "usage",
-    "title": "How to Launch with ShipAny",
-    "description": "Get your AI SaaS startup running in three simple steps:",
+    "title": "How to Create a Coloring Page",
+    "description": "Generate your coloring page in three easy steps:",
     "image": {
       "src": "/imgs/features/1.png"
     },
@@ -227,8 +227,8 @@
   },
   "feature": {
     "name": "feature",
-    "title": "Key Features of ShipAny",
-    "description": "Everything you need to launch your AI SaaS startup quickly and efficiently.",
+    "title": "Key Features of Our Generator",
+    "description": "Powerful AI tools for seamless coloring page creation.",
     "items": [
       {
         "title": "Next.js Boilerplate",
@@ -264,8 +264,8 @@
   },
   "showcase": {
     "name": "showcase",
-    "title": "AI SaaS Startups built with ShipAny",
-    "description": "Easy to use and fast to ship.",
+    "title": "Explore AI-Generated Coloring Pages",
+    "description": "Discover creations made by our users.",
     "items": [
       {
         "title": "ThinkAny",
@@ -353,8 +353,8 @@
   "stats": {
     "name": "stats",
     "label": "Stats",
-    "title": "People Love ShipAny",
-    "description": "for it's easy to use and fast to ship.",
+    "title": "Loved by Coloring Enthusiasts",
+    "description": "Join thousands of users generating AI coloring pages.",
     "icon": "FaRegHeart",
     "items": [
       {
@@ -378,7 +378,7 @@
     "name": "pricing",
     "label": "Pricing",
     "title": "Pricing",
-    "description": "Get all features of ShipAny, Ship your AI SaaS startups fast.",
+    "description": "Choose a plan to unlock advanced features for your coloring page generator.",
     "groups": [],
     "items": [
       {
@@ -404,7 +404,7 @@
         "is_featured": false,
         "tip": "Pay once. Build unlimited projects!",
         "button": {
-          "title": "Get ShipAny",
+          "title": "Choose Plan",
           "url": "/#pricing",
           "icon": "RiFlashlightFill"
         },
@@ -438,7 +438,7 @@
         "is_featured": true,
         "tip": "Pay once. Build unlimited projects!",
         "button": {
-          "title": "Get ShipAny",
+          "title": "Choose Plan",
           "url": "/#pricing",
           "icon": "RiFlashlightFill"
         },
@@ -470,7 +470,7 @@
         "is_featured": false,
         "tip": "Pay once. Build unlimited projects!",
         "button": {
-          "title": "Get ShipAny",
+          "title": "Choose Plan",
           "url": "/#pricing",
           "icon": "RiFlashlightFill"
         },
@@ -484,8 +484,8 @@
   "testimonial": {
     "name": "testimonial",
     "label": "Testimonial",
-    "title": "What Users Say About ShipAny",
-    "description": "Hear from developers and founders who launched their AI startups with ShipAny.",
+    "title": "What Users Say About Our AI Generator",
+    "description": "Hear how users create unique coloring pages.",
     "icon": "GoThumbsup",
     "items": [
       {
@@ -541,49 +541,37 @@
   "faq": {
     "name": "faq",
     "label": "FAQ",
-    "title": "Frequently Asked Questions About ShipAny",
+    "title": "Frequently Asked Questions",
     "description": "Have another question? Contact us on Discord or by email.",
     "items": [
       {
-        "title": "What exactly is ShipAny and how does it work?",
-        "description": "ShipAny is a comprehensive NextJS boilerplate designed specifically for building AI SaaS startups. It provides ready-to-use templates, infrastructure setup, and deployment tools that help you launch your AI business in hours instead of days."
+        "title": "What is AI Coloring Page Generator?",
+        "description": "Our tool transforms photos and text prompts into printable coloring pages using AI."
       },
       {
-        "title": "Do I need advanced technical skills to use ShipAny?",
-        "description": "While basic programming knowledge is helpful, ShipAny is designed to be developer-friendly. Our templates and documentation make it easy to get started, even if you're not an expert in AI or cloud infrastructure."
+        "title": "What file formats can I upload?",
+        "description": "Upload JPEG or PNG images up to 5MB to create coloring pages."
       },
       {
-        "title": "What types of AI SaaS can I build with ShipAny?",
-        "description": "ShipAny supports a wide range of AI applications, from content generation to data analysis tools. Our templates cover popular use cases like AI chatbots, content generators, image processing apps, and more."
-      },
-      {
-        "title": "How long does it typically take to launch with ShipAny?",
-        "description": "With ShipAny, you can have a working prototype in hours and a production-ready application in hours. Our one-click deployment and pre-configured infrastructure significantly reduce the traditional months-long development cycle."
-      },
-      {
-        "title": "What's included in the ShipAny infrastructure?",
-        "description": "ShipAny provides a complete infrastructure stack including authentication, database setup, API integration, payment processing, and scalable cloud deployment. Everything is pre-configured following industry best practices."
-      },
-      {
-        "title": "Can I customize the templates to match my brand?",
-        "description": "Absolutely! All ShipAny templates are fully customizable. You can modify the design, features, and functionality to match your brand identity and specific business requirements while maintaining the robust underlying infrastructure."
+        "title": "Is it free to use?",
+        "description": "Basic features are free. Premium plans unlock higher resolution and batch processing."
       }
     ]
   },
   "cta": {
     "name": "cta",
-    "title": "Ship your first AI SaaS Startup",
-    "description": "Start from here, ship with ShipAny.",
+    "title": "Start Generating Coloring Pages",
+    "description": "Create your first coloring page with AI now.",
     "buttons": [
       {
-        "title": "Get ShipAny",
-        "url": "https://shipany.ai",
+        "title": "Create Page",
+        "url": "/#feature",
         "target": "_blank",
         "icon": "GoArrowUpRight"
       },
       {
-        "title": "Read Document",
-        "url": "https://docs.shipany.ai",
+        "title": "View Examples",
+        "url": "/#showcase",
         "target": "_blank",
         "variant": "outline"
       }
@@ -592,15 +580,15 @@
   "footer": {
     "name": "footer",
     "brand": {
-      "title": "ShipAny",
-      "description": "ShipAny is a NextJS boilerplate for building AI SaaS startups. Ship Fast with a variety of templates and components.",
+      "title": "Mimi Panda",
+      "description": "Create unique coloring pages from your photos and text with AI.",
       "logo": {
-        "src": "/logo.png",
-        "alt": "ShipAny"
+        "src": "/imgs/logo.png",
+        "alt": "Mimi Panda"
       },
-      "url": "/"
+      "url": "https://mimi-panda.com/"
     },
-    "copyright": "© 2025 • ShipAny All rights reserved.",
+    "copyright": "© 2025 • Mimi Panda All rights reserved.",
     "nav": {
       "items": [
         {
