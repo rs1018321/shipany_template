@@ -14,12 +14,12 @@ import { Post } from "@/types/post";
 import { getIsoTimestr } from "@/lib/time";
 import { getUserInfo } from "@/services/user";
 
-export default async function ({
+export default async function EditPostPage({
   params,
 }: {
-  params: { uuid: string };
+  params: { locale: string; uuid: string };
 }) {
-  const { uuid } = params;
+  const { locale, uuid } = params;
   const user = await getUserInfo();
   if (!user || !user.uuid) {
     return <Empty message="no auth" />;
