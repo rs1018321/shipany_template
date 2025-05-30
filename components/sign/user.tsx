@@ -35,6 +35,11 @@ export default function SignUser({ user }: { user: User }) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
+        <DropdownMenuLabel className="text-center truncate">
+          {user.email}
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+
         <DropdownMenuItem className="flex justify-center cursor-pointer">
           <Link href="/my-orders">{t("user.user_center")}</Link>
         </DropdownMenuItem>
