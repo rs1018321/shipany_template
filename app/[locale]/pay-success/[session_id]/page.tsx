@@ -5,10 +5,10 @@ import { redirect } from "next/navigation";
 export default async function ({
   params,
 }: {
-  params: Promise<{ session_id: string }>;
+  params: { session_id: string };
 }) {
   try {
-    const { session_id } = await params;
+    const { session_id } = params;
 
     const stripe = new Stripe(process.env.STRIPE_PRIVATE_KEY || "");
     const session = await stripe.checkout.sessions.retrieve(session_id);

@@ -6,9 +6,9 @@ import Empty from "@/components/blocks/empty";
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ locale: string; slug: string }>;
+  params: { locale: string; slug: string };
 }) {
-  const { locale, slug } = await params;
+  const { locale, slug } = params;
 
   const post = await findPostBySlug(slug, locale);
 
@@ -30,9 +30,9 @@ export async function generateMetadata({
 export default async function ({
   params,
 }: {
-  params: Promise<{ locale: string; slug: string }>;
+  params: { locale: string; slug: string };
 }) {
-  const { locale, slug } = await params;
+  const { locale, slug } = params;
   const post = await findPostBySlug(slug, locale);
 
   if (!post || post.status !== PostStatus.Online) {

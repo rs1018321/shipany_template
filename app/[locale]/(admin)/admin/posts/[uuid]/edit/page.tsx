@@ -17,9 +17,9 @@ import { getUserInfo } from "@/services/user";
 export default async function ({
   params,
 }: {
-  params: Promise<{ uuid: string }>;
+  params: { uuid: string };
 }) {
-  const { uuid } = await params;
+  const { uuid } = params;
   const user = await getUserInfo();
   if (!user || !user.uuid) {
     return <Empty message="no auth" />;

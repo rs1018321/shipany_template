@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 
 const API_URL = "https://ismaque.org/v1/images/generations"
-const API_KEY = "sk-kdpP7Q3MxIhSlwvQ01GWm4tY0GEsMAUdJfDpmQxWUGScjkt1"
+const API_KEY = process.env.OPENAI_API_KEY!;
 
 export async function POST(request: NextRequest) {
   const startTime = Date.now()

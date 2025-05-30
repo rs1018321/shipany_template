@@ -6,9 +6,9 @@ import { getTranslations } from "next-intl/server";
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ locale: string }>;
+  params: { locale: string };
 }) {
-  const { locale } = await params;
+  const { locale } = params;
   const t = await getTranslations();
 
   let canonicalUrl = `${process.env.NEXT_PUBLIC_WEB_URL}/posts`;
@@ -29,9 +29,9 @@ export async function generateMetadata({
 export default async function ({
   params,
 }: {
-  params: Promise<{ locale: string }>;
+  params: { locale: string };
 }) {
-  const { locale } = await params;
+  const { locale } = params;
   const t = await getTranslations();
 
   const posts = await getPostsByLocale(locale);

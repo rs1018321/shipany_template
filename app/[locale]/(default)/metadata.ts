@@ -1,9 +1,9 @@
 export async function generateMetadata({
     params,
   }: {
-    params: Promise<{ locale: string }>;
+    params: { locale: string };
   }) {
-    const { locale } = await params;
+    const { locale } = params;
     let canonicalUrl = `${process.env.NEXT_PUBLIC_WEB_URL}`;
   
     if (locale !== "en") {
