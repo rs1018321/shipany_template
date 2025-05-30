@@ -17,9 +17,9 @@ import { getUserInfo } from "@/services/user";
 export default async function EditPostPage({
   params,
 }: {
-  params: { locale: string; uuid: string };
+  params: Promise<{ locale: string; uuid: string }>;
 }) {
-  const { locale, uuid } = params;
+  const { locale, uuid } = await params;
   const user = await getUserInfo();
   if (!user || !user.uuid) {
     return <Empty message="no auth" />;
