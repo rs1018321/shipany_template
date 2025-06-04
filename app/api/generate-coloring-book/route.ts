@@ -60,8 +60,10 @@ export async function POST(request: NextRequest) {
       prompt: "Convert this colored illustration into clean black-and-white coloring-book line art. Keep only the essential outlines of the main character and scene, drawing bold, continuous pure-black strokes. Remove all color, shading, gradients and fills, leaving crisp, simple contours. Background must stay pure white. Output as a high-resolution PNG",
       guidance_scale: 2.5,
       num_inference_steps: 28,
-      width: parseInt(size.split('x')[0]),
-      height: parseInt(size.split('x')[1]),
+      aspect_ratio: size === "1024x1024" ? "1:1" :     // 1:1 正方形
+                   size === "832x1248" ? "2:3" :      // 2:3 竖版
+                   size === "1248x832" ? "3:2" :      // 3:2 横版
+                   "1:1",                              // 默认 1:1
       seed: Math.floor(Math.random() * 1000000)
     }
 

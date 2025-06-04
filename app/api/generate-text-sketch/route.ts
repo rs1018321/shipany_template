@@ -35,9 +35,10 @@ export async function POST(request: NextRequest) {
     // 准备 Replicate API 参数
     const input = {
       prompt: fullPrompt,
-      aspect_ratio: size === "1024x1024" ? "1:1" : 
-                   size === "1024x768" ? "4:3" : 
-                   size === "768x1024" ? "3:4" : "1:1",
+      aspect_ratio: size === "1024x1024" ? "1:1" :     // 1:1 正方形
+                   size === "832x1248" ? "2:3" :      // 2:3 竖版
+                   size === "1248x832" ? "3:2" :      // 3:2 横版
+                   "1:1",                              // 默认 1:1
       number_of_images: 1,
       prompt_optimizer: true
     }

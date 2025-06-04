@@ -48,20 +48,20 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
   const [textError, setTextError] = useState<string | null>(null)
   
   // 添加尺寸比例状态
-  const [imageAspectRatio, setImageAspectRatio] = useState<string>("2:3")
-  const [textAspectRatio, setTextAspectRatio] = useState<string>("2:3")
+  const [imageAspectRatio, setImageAspectRatio] = useState<string>("1:1")
+  const [textAspectRatio, setTextAspectRatio] = useState<string>("1:1")
 
   // 将比例转换为具体尺寸
   const getImageSize = (aspectRatio: string): string => {
-    const baseSize = 1024
     switch (aspectRatio) {
-      case "2:3":
-        return "832x1248" // 2:3 比例
-      case "3:2":
-        return "1248x832" // 3:2 比例
       case "1:1":
+        return "1024x1024" // 1:1 比例 (正方形)
+      case "2:3":
+        return "832x1248"  // 2:3 比例 (竖版)
+      case "3:2":
+        return "1248x832"  // 3:2 比例 (横版)
       default:
-        return "1024x1024" // 1:1 比例
+        return "1024x1024" // 默认 1:1 比例
     }
   }
 

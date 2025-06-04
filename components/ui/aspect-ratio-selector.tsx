@@ -8,9 +8,9 @@ export interface AspectRatio {
 }
 
 const aspectRatios: AspectRatio[] = [
+  { label: "1:1", value: "1:1", ratio: 1 },
   { label: "2:3", value: "2:3", ratio: 2/3 },
-  { label: "3:2", value: "3:2", ratio: 3/2 },
-  { label: "1:1", value: "1:1", ratio: 1 }
+  { label: "3:2", value: "3:2", ratio: 3/2 }
 ]
 
 interface AspectRatioSelectorProps {
@@ -19,7 +19,7 @@ interface AspectRatioSelectorProps {
   className?: string
 }
 
-export function AspectRatioSelector({ value = "2:3", onChange, className }: AspectRatioSelectorProps) {
+export function AspectRatioSelector({ value = "1:1", onChange, className }: AspectRatioSelectorProps) {
   return (
     <div className={cn("space-y-2", className)}>
       <h4 className="text-sm font-medium text-gray-700">长宽比</h4>
