@@ -1,6 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Replicate from 'replicate'
 
+// ------ 新增：获取最新 version 哈希 ------
+// async function getLatestVersionId() {
+//   const res = await fetch(
+//     "https://api.replicate.com/v1/models/black-forest-labs/flux-kontext-pro/versions",
+//     {
+//       headers: {
+//         Authorization: `Token ${process.env.REPLICATE_API_TOKEN}`,
+//       },
+//     }
+//   );
+//   if (!res.ok)
+//     throw new Error(`Replicate version list HTTP ${res.status}`);
+
+//   const json = await res.json();
+//   return json.results[0].id as string; // 第 0 条就是最新
+// }
+// ----------------------------------------
+
+
 const replicate = new Replicate({
   auth: process.env.REPLICATE_API_TOKEN!,
 })
@@ -36,7 +55,8 @@ export async function POST(request: NextRequest) {
 
     // 准备 Replicate API 参数
     const input = {
-      image: imageDataUrl,
+      //image: imageDataUrl,
+      input_image: imageDataUrl,  
       prompt: "Convert this colored illustration into clean black-and-white coloring-book line art. Keep only the essential outlines of the main character and scene, drawing bold, continuous pure-black strokes. Remove all color, shading, gradients and fills, leaving crisp, simple contours. Background must stay pure white. Output as a high-resolution PNG",
       guidance_scale: 2.5,
       num_inference_steps: 28,
@@ -55,7 +75,22 @@ export async function POST(request: NextRequest) {
         const startTime = Date.now()
 
         // 调用 Replicate API
-        const output = await replicate.run("black-forest-labs/flux-kontext-pro", { input }) as any
+        // 原来：
+        //const output = await replicate.run("black-forest-labs/flux-kontext-pro", { input }) 
+
+        // 改成：
+        
+        
+        //const MODEL = `black-forest-labs/flux-kontext-pro:${latest}`;
+        const output = await replicate.run("black-forest-labs/flux-kontext-pro", { input }) as any;
+
+
+        //const output = await replicate.run(MODEL, { input });
+        
+
+
+        
+
 
         console.log(`📡 Replicate API 调用成功`)
         console.log("🔍 输出类型:", typeof output)
@@ -72,6 +107,7 @@ export async function POST(request: NextRequest) {
           // 如果返回数组，取第一个元素
           imageUrl = output[0]
           console.log("📎 输出格式: URL 数组")
+          
         } else if (output && typeof output.getReader === 'function') {
           // 如果是 ReadableStream，直接读取为二进制图片数据
           console.log("📎 输出格式: ReadableStream (二进制图片数据)")
