@@ -1,180 +1,194 @@
-import { NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from 'next/server'
+import Replicate from 'replicate'
 
-const API_URL = "https://ismaque.org/v1/images/generations"
-const API_KEY = "sk-kdpP7Q3MxIhSlwvQ01GWm4tY0GEsMAUdJfDpmQxWUGScjkt1"
+const replicate = new Replicate({
+  auth: process.env.REPLICATE_TEXT_API_TOKEN!,
+})
 
 export async function POST(request: NextRequest) {
-  const startTime = Date.now()
-  const maxRetries = 1
-  let lastError: Error | null = null
-  let imageData: any
+  const maxRetries = 3
+  const baseDelay = 5000
+
+  // 检查 API token
+  if (!process.env.REPLICATE_TEXT_API_TOKEN) {
+    console.error("❌ REPLICATE_TEXT_API_TOKEN 环境变量未设置")
+    return NextResponse.json({ error: "API 配置错误，请联系管理员" }, { status: 500 })
+  }
 
   try {
+    console.log("🚀 开始处理文生图请求")
+
+    // 读取请求参数
     const { prompt, size = "1024x1024" } = await request.json()
+    
     if (!prompt) {
-      return NextResponse.json({ success: false, error: "没有收到描述" }, { status: 400 })
+      return NextResponse.json({ error: "没有收到描述" }, { status: 400 })
     }
 
-    const fullPrompt = `Simple black and white line art coloring page of ${prompt.trim()}, clean minimalist outlines, simple shapes, suitable for children to color, no shading, no details, just clear black lines on white background`
-    
-    console.log(`📝 文字生成请求: ${prompt}, 输出尺寸: ${size}`)
-    console.log(`📝 优化后的提示词: ${fullPrompt}`)
+    // 构建完整的提示词（在用户描述后添加涂色图要求）
+    const fullPrompt = `${prompt.trim()}, drawn as clean black-and-white coloring-book line art for children. Keep only bold, continuous pure-black outlines of the main subject and essential scene elements; remove all color, shading, gradients and fills. Have the characters and scene elements fill the entire canvas, avoiding large blank areas. Background must remain pure white. Centered composition, high-resolution PNG.`
 
+    console.log(`📝 文字生成请求: ${prompt}`)
+    console.log(`📝 输出尺寸: ${size}`)
+    console.log(`📝 完整提示词: ${fullPrompt}`)
+
+    // 准备 Replicate API 参数
+    const input = {
+      prompt: fullPrompt,
+      aspect_ratio: size === "1024x1024" ? "1:1" : 
+                   size === "1024x768" ? "4:3" : 
+                   size === "768x1024" ? "3:4" : "1:1",
+      number_of_images: 1,
+      prompt_optimizer: true
+    }
+
+    // 重试循环
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
-        console.log(`🔄 第 ${attempt} 次尝试调用文生图API`)
+        console.log(`🔄 第 ${attempt} 次尝试调用 Replicate API`)
+        console.log("🌐 准备调用 Replicate API: minimax/image-01")
+        console.log("🔑 API Token 已设置:", process.env.REPLICATE_TEXT_API_TOKEN ? '是' : '否')
 
-        const apiResponse = await fetch(API_URL, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: API_KEY,
-          },
-          body: JSON.stringify({
-            prompt: fullPrompt,
-            n: 1,
-            model: "gpt-image-1",
-            size: size,
-            response_format: "b64_json",
-          }),
-          signal: AbortSignal.timeout(240000),
-        })
+        const startTime = Date.now()
 
-        console.log(`📡 API响应状态: ${apiResponse.status} ${apiResponse.statusText}`)
+        // 调用 Replicate API
+        const output = await replicate.run("minimax/image-01", { input }) as any
 
-        const responseText = await apiResponse.text()
-        console.log("📄 API原始响应文本长度:", responseText.length)
+        console.log(`📡 Replicate API 调用成功`)
+        console.log("🔍 输出类型:", typeof output)
+        console.log("🔍 输出内容:", output)
 
-        if (!apiResponse.ok) {
-          console.error("❌ API调用失败:", {
-            status: apiResponse.status,
-            statusText: apiResponse.statusText,
-            responseText: responseText.substring(0, 500), // 只记录前500字符
-          })
+        // 处理 Replicate 输出（可能是 URL 数组或 ReadableStream）
+        let imageUrl: string
+        let imageData: string
 
-          if (responseText.includes("FUNCTION_INVOCATION_TIMEOUT")) {
-            return NextResponse.json(
-              {
-                success: false,
-                error: "API处理超时，请稍后重试或简化描述",
-                debug: {
-                  status: apiResponse.status,
-                  statusText: apiResponse.statusText,
-                  errorType: "TIMEOUT",
-                  suggestion: "尝试简化描述或稍后重试",
-                  apiUrl: API_URL,
-                  timestamp: new Date().toISOString(),
-                },
-              },
-              { status: 408 },
-            )
+        if (Array.isArray(output) && output.length > 0) {
+          const firstOutput = output[0]
+          
+          if (typeof firstOutput === 'string') {
+            // minimax/image-01 返回 URL 数组
+            imageUrl = firstOutput
+            console.log("📎 输出格式: URL 数组")
+            
+            // 验证 URL 格式
+            if (!imageUrl || !imageUrl.startsWith('http')) {
+              throw new Error(`无效的图片 URL: ${imageUrl}`)
+            }
+
+            // 下载图片并转换为 base64
+            const imageResponse = await fetch(imageUrl)
+            if (!imageResponse.ok) {
+              throw new Error(`下载生成的图片失败: ${imageResponse.status} ${imageResponse.statusText}`)
+            }
+            
+            const imageBuffer = await imageResponse.arrayBuffer()
+            imageData = Buffer.from(imageBuffer).toString('base64')
+            
+          } else if (firstOutput && typeof firstOutput.getReader === 'function') {
+            // 如果是 ReadableStream，直接读取为二进制图片数据
+            console.log("📎 输出格式: ReadableStream (二进制图片数据)")
+            const reader = firstOutput.getReader()
+            const chunks = []
+            
+            try {
+              while (true) {
+                const { done, value } = await reader.read()
+                if (done) break
+                chunks.push(value)
+              }
+              
+              // 将 chunks 合并为完整的图片数据
+              const fullData = new Uint8Array(chunks.reduce((acc, chunk) => acc + chunk.length, 0))
+              let offset = 0
+              for (const chunk of chunks) {
+                fullData.set(chunk, offset)
+                offset += chunk.length
+              }
+              
+              console.log("📄 获取到图片数据，大小:", fullData.length, "bytes")
+              console.log("📄 文件头:", fullData.slice(0, 8))
+              
+              // 直接将二进制数据转换为 base64
+              imageData = Buffer.from(fullData).toString('base64')
+              
+            } finally {
+              reader.releaseLock()
+            }
+          } else {
+            console.error("❌ 未知的数组元素格式:", firstOutput)
+            throw new Error(`不支持的数组元素格式: ${typeof firstOutput}`)
+          }
+        } else if (typeof output === 'string') {
+          // 如果直接返回单个 URL
+          imageUrl = output
+          console.log("📎 输出格式: 直接 URL 字符串")
+          
+          // 验证 URL 格式
+          if (!imageUrl || !imageUrl.startsWith('http')) {
+            throw new Error(`无效的图片 URL: ${imageUrl}`)
           }
 
-          return NextResponse.json(
-            {
-              success: false,
-              error: `API调用失败: ${apiResponse.status} - ${responseText}`,
-              debug: {
-                status: apiResponse.status,
-                statusText: apiResponse.statusText,
-                apiUrl: API_URL,
-                timestamp: new Date().toISOString(),
-              },
-            },
-            { status: apiResponse.status },
-          )
+          // 下载图片并转换为 base64
+          const imageResponse = await fetch(imageUrl)
+          if (!imageResponse.ok) {
+            throw new Error(`下载生成的图片失败: ${imageResponse.status} ${imageResponse.statusText}`)
+          }
+          
+          const imageBuffer = await imageResponse.arrayBuffer()
+          imageData = Buffer.from(imageBuffer).toString('base64')
+          
+        } else {
+          console.error("❌ 未知的输出格式:", output)
+          throw new Error(`不支持的输出格式: ${typeof output}`)
         }
 
-        let apiResult: any
-        try {
-          apiResult = JSON.parse(responseText)
-          console.log("📦 API响应数据结构:", {
-            hasData: !!apiResult.data,
-            dataLength: apiResult.data?.length || 0,
-            keys: Object.keys(apiResult),
-          })
-        } catch (parseError) {
-          console.error("❌ JSON解析失败:", parseError)
-          return NextResponse.json(
-            {
-              success: false,
-              error: "API响应不是有效的JSON格式",
-              debug: {
-                parseError: parseError instanceof Error ? parseError.message : String(parseError),
-                responseText: responseText.substring(0, 500),
-                apiUrl: API_URL,
-                timestamp: new Date().toISOString(),
-              },
-            },
-            { status: 500 },
-          )
-        }
+        console.log("✅ 图片数据处理成功，base64长度:", imageData.length)
 
-        if (!apiResult.data?.[0]?.b64_json) {
-          console.error("❌ API响应格式错误:", apiResult)
-          return NextResponse.json(
-            {
-              success: false,
-              error: "API响应格式错误",
-              debug: {
-                apiResult,
-                expectedFormat: "data数组包含b64_json格式的图片",
-              },
-            },
-            { status: 500 },
-          )
-        }
+        // 如果成功，返回结果
+        const processingTime = Date.now() - startTime
+        
+        return NextResponse.json({
+          success: true,
+          image: imageData,
+          processingTime: `${processingTime}ms`,
+          model: "minimax/image-01",
+          attempt: attempt,
+          debug: {
+            promptLength: prompt.length,
+            fullPromptLength: fullPrompt.length,
+            imageGenerated: true
+          }
+        })
 
-        imageData = apiResult.data[0].b64_json
-        // 如果成功，跳出重试循环
-        break
-      } catch (error) {
-        lastError = error as Error
+      } catch (error: any) {
         console.error(`❌ 第 ${attempt} 次尝试失败:`, error)
 
-        if (attempt < maxRetries) {
-          const delay = attempt * 5000 // 5秒, 10秒
-          console.log(`⏳ 等待 ${delay}ms 后重试...`)
-          await new Promise((resolve) => setTimeout(resolve, delay))
+        if (attempt === maxRetries) {
+          console.error("❌ 文生图最终失败:", error.message)
+          return NextResponse.json({ 
+            error: error.message || "文生图生成失败",
+            model: "minimax/image-01",
+            attempts: maxRetries,
+            suggestion: error.message.includes('rate limit') ? '请稍后再试，API 调用频率限制' :
+                       error.message.includes('timeout') ? '请尝试简化描述或稍后重试' :
+                       error.message.includes('Unauthorized') || error.message.includes('authentication') ? 'API 认证失败，请检查配置' :
+                       error.message.includes('invalid') ? '请检查描述是否符合要求' : 
+                       '请检查网络连接或稍后重试'
+          }, { status: 500 })
         }
+
+        // 等待后重试
+        const delay = baseDelay * attempt
+        console.log(`⏳ 等待 ${delay}ms 后重试...`)
+        await new Promise(resolve => setTimeout(resolve, delay))
       }
     }
 
-    if (lastError) {
-      throw lastError
-    }
-
-    const processingTime = Date.now() - startTime
-    console.log(`✅ 文字生成成功，耗时: ${processingTime}ms`)
-
+  } catch (error: any) {
+    console.error("❌ 请求处理失败:", error)
     return NextResponse.json({ 
-      success: true, 
-      image: imageData, 
-      processingTime,
-      debug: {
-        promptLength: prompt.length,
-        apiResponseTime: processingTime,
-        imageGenerated: true,
-      }
-    })
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error)
-    console.error("❌ 文字生成最终失败:", message)
-    
-    let errorMessage = "生成失败，请重试"
-    if (message.includes("timeout") || message.includes("TIMEOUT")) {
-      errorMessage = "请求超时，请稍后重试或简化描述"
-    } else if (message.includes("fetch")) {
-      errorMessage = "网络连接问题，请检查网络后重试"
-    }
-    
-    return NextResponse.json({ 
-      success: false, 
-      error: errorMessage,
-      debug: {
-        originalError: message,
-        timestamp: new Date().toISOString(),
-      }
+      error: error.message || "请求处理失败",
+      suggestion: '请检查描述是否正确'
     }, { status: 500 })
   }
 } 

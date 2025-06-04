@@ -289,7 +289,7 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
     }
     setIsGeneratingText(true)
     setTextError(null)
-    setDebugInfo("文字生成线稿中，这可能需要2-4分钟，请耐心等待...")
+    setDebugInfo("使用 Minimax Image-01 模型生成线稿中，这可能需要30-60秒，请耐心等待...")
     try {
       const response = await fetch("/api/generate-text-sketch", {
         method: "POST",
@@ -300,7 +300,11 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
         }),
       })
       const result = await response.json()
-      if (!response.ok) throw new Error(result.error || `API调用失败: ${response.status}`)
+      if (!response.ok) {
+        const errorMessage = result.error || `API调用失败: ${response.status}`
+        const suggestion = result.suggestion || "请稍后重试"
+        throw new Error(`${errorMessage}。建议：${suggestion}`)
+      }
       if (result.success && result.image) {
         let textImageData = result.image
         const base64Prefix = "data:image/png;base64,"
@@ -308,13 +312,23 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
           textImageData = base64Prefix + textImageData
         }
         setTextGeneratedImage(textImageData)
-        setDebugInfo(`文字生成成功! 耗时: ${Math.round(result.processingTime / 1000)}秒`)
+        setDebugInfo(`Minimax Image-01 生成成功! 处理时间: ${result.processingTime}, 尝试次数: ${result.attempt}`)
       } else {
         throw new Error(result.error || "生成失败")
       }
     } catch (error) {
-      setTextError(error instanceof Error ? error.message : String(error))
+      const errorMessage = error instanceof Error ? error.message : String(error)
+      setTextError(errorMessage)
       setDebugInfo("")
+      
+      // 根据错误类型给出更具体的建议
+      if (errorMessage.includes('认证失败')) {
+        setTextError("API 认证失败，请联系管理员检查配置")
+      } else if (errorMessage.includes('频率限制')) {
+        setTextError("API 调用频率限制，请稍后再试")
+      } else if (errorMessage.includes('timeout') || errorMessage.includes('超时')) {
+        setTextError("请求超时，请尝试简化描述或稍后重试")
+      }
     } finally {
       setIsGeneratingText(false)
     }
