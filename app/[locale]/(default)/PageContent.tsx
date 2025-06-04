@@ -195,7 +195,7 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
 
     setIsGenerating(true)
     setError(null)
-    setDebugInfo("开始生成线稿图...")
+    setDebugInfo("开始生成线稿图，使用 Flux Kontext Pro 模型...")
 
     try {
       // 将base64转换为File对象
@@ -204,14 +204,9 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
 
       const formData = new FormData()
       formData.append("image", blob, "image.png")
-      formData.append("prompt", "转换为黑白线稿涂色图，简洁的线条，适合儿童涂色")
-      formData.append("model", "gpt-image-1")
-      formData.append("n", "1")
-      formData.append("quality", "auto")
-      formData.append("response_format", "b64_json")
       formData.append("size", getImageSize(imageAspectRatio))
 
-      setDebugInfo("正在调用API...")
+      setDebugInfo("正在调用 Replicate API...")
 
       const apiResponse = await fetch("/api/generate-coloring-book", {
         method: "POST",
@@ -241,7 +236,7 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
           timestamp: Date.now(),
         })
 
-        setDebugInfo(`生成成功! 耗时: ${result.processingTime}ms`)
+        setDebugInfo(`生成成功! 使用 Flux Kontext Pro 模型，耗时: ${result.processingTime}ms`)
       } else {
         throw new Error(result.error || "生成失败")
       }
@@ -260,6 +255,8 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
           debugDetails += "\n建议: 图片处理超时，请尝试使用更小的图片或稍后重试"
         } else if (error.message.includes("fetch")) {
           debugDetails += "\n可能的原因: 网络连接问题或API服务不可用"
+        } else if (error.message.includes("quota") || error.message.includes("rate limit")) {
+          debugDetails += "\n建议: API 调用限额已达上限，请稍后重试"
         }
       }
 

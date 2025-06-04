@@ -1,192 +1,189 @@
-import { type NextRequest, NextResponse } from "next/server"
+import { NextRequest, NextResponse } from 'next/server'
+import Replicate from 'replicate'
 
-const API_URL = "https://ismaque.org/v1/images/edits"
-const API_KEY = "sk-kdpP7Q3MxIhSlwvQ01GWm4tY0GEsMAUdJfDpmQxWUGScjkt1"
+const replicate = new Replicate({
+  auth: process.env.REPLICATE_API_TOKEN!,
+})
 
 export async function POST(request: NextRequest) {
-  const startTime = Date.now()
-  const maxRetries = 2
-  let lastError: Error | null = null
-  let imageData: any // Declare imageData here
+  const maxRetries = 3
+  const baseDelay = 5000
 
-  // 将 formData 读取移到重试循环外面，避免多次读取
-  const formData = await request.formData()
-  const image = formData.get("image") as File
-  const size = formData.get("size") as string || "1024x1024"
-  
-  if (!image) {
-    console.error("❌ 没有收到图片文件")
-    return NextResponse.json({ success: false, error: "没有收到图片文件" }, { status: 400 })
+  // 检查 API token
+  if (!process.env.REPLICATE_API_TOKEN) {
+    console.error("❌ REPLICATE_API_TOKEN 环境变量未设置")
+    return NextResponse.json({ error: "API 配置错误，请联系管理员" }, { status: 500 })
   }
 
-  console.log(`📁 收到图片文件: ${image.name}, 大小: ${image.size} bytes, 输出尺寸: ${size}`)
+  try {
+    console.log("🚀 开始处理图片生成请求")
 
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      console.log(`🔄 第 ${attempt} 次尝试调用API`)
-      console.log("🚀 开始处理图片生成请求")
+    // 在重试循环外读取 formData（只能读取一次）
+    const formData = await request.formData()
+    const file = formData.get('image') as File
+    const size = formData.get('size') as string || '1024x1024'
 
-      // 创建新的FormData发送给API
-      const apiFormData = new FormData()
-      apiFormData.append("image", image)
-      apiFormData.append("prompt", "转换为黑白线稿涂色图，简洁的线条，适合儿童涂色")
-      apiFormData.append("model", "gpt-image-1")
-      apiFormData.append("n", "1")
-      apiFormData.append("quality", "auto")
-      apiFormData.append("response_format", "b64_json")
-      apiFormData.append("size", size)
+    if (!file) {
+      return NextResponse.json({ error: "未上传图片" }, { status: 400 })
+    }
 
-      console.log("🌐 准备调用外部API:", API_URL)
+    // 转换图片为 base64（只需要做一次）
+    const bytes = await file.arrayBuffer()
+    const base64Image = Buffer.from(bytes).toString('base64')
+    const imageDataUrl = `data:${file.type};base64,${base64Image}`
 
-      // 调用外部API
-      const apiResponse = await fetch(API_URL, {
-        method: "POST",
-        headers: {
-          Authorization: API_KEY,
-        },
-        body: apiFormData,
-        signal: AbortSignal.timeout(120000), // 120秒超时
-      })
+    console.log(`📁 收到图片文件: ${file.name}, 大小: ${file.size} bytes, 输出尺寸: ${size}`)
 
-      console.log(`📡 API响应状态: ${apiResponse.status} ${apiResponse.statusText}`)
+    // 准备 Replicate API 参数
+    const input = {
+      image: imageDataUrl,
+      prompt: "Convert this colored illustration into clean black-and-white coloring-book line art. Keep only the essential outlines of the main character and scene, drawing bold, continuous pure-black strokes. Remove all color, shading, gradients and fills, leaving crisp, simple contours. Background must stay pure white. Output as a high-resolution PNG",
+      guidance_scale: 2.5,
+      num_inference_steps: 28,
+      width: parseInt(size.split('x')[0]),
+      height: parseInt(size.split('x')[1]),
+      seed: Math.floor(Math.random() * 1000000)
+    }
 
-      // 先获取原始响应文本
-      const responseText = await apiResponse.text()
-      console.log("📄 API原始响应文本:", responseText)
+    // 重试循环（只重试 API 调用部分）
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`🔄 第 ${attempt} 次尝试调用 Replicate API`)
+        console.log("🌐 准备调用 Replicate API: black-forest-labs/flux-kontext-pro")
+        console.log("🔑 API Token 已设置:", process.env.REPLICATE_API_TOKEN ? '是' : '否')
 
-      if (!apiResponse.ok) {
-        console.error("❌ API调用失败:", {
-          status: apiResponse.status,
-          statusText: apiResponse.statusText,
-          responseText: responseText,
-        })
+        const startTime = Date.now()
 
-        if (responseText.includes("FUNCTION_INVOCATION_TIMEOUT")) {
-          return NextResponse.json(
-            {
-              success: false,
-              error: "API处理超时，请稍后重试或尝试使用更小的图片",
-              debug: {
-                status: apiResponse.status,
-                statusText: apiResponse.statusText,
-                responseText: responseText,
-                errorType: "TIMEOUT",
-                suggestion: "尝试压缩图片或稍后重试",
-                apiUrl: API_URL,
-                timestamp: new Date().toISOString(),
-              },
-            },
-            { status: 408 },
-          )
+        // 调用 Replicate API
+        const output = await replicate.run("black-forest-labs/flux-kontext-pro", { input }) as any
+
+        console.log(`📡 Replicate API 调用成功`)
+        console.log("🔍 输出类型:", typeof output)
+        console.log("🔍 输出构造函数:", output?.constructor?.name)
+
+        // 处理不同类型的 Replicate 输出
+        let imageUrl: string
+
+        if (typeof output === 'string') {
+          // 直接返回 URL 字符串
+          imageUrl = output
+          console.log("📎 输出格式: 直接 URL 字符串")
+        } else if (Array.isArray(output) && output.length > 0) {
+          // 如果返回数组，取第一个元素
+          imageUrl = output[0]
+          console.log("📎 输出格式: URL 数组")
+        } else if (output && typeof output.getReader === 'function') {
+          // 如果是 ReadableStream，直接读取为二进制图片数据
+          console.log("📎 输出格式: ReadableStream (二进制图片数据)")
+          const reader = output.getReader()
+          const chunks = []
+          
+          try {
+            while (true) {
+              const { done, value } = await reader.read()
+              if (done) break
+              chunks.push(value)
+            }
+            
+            // 将 chunks 合并为完整的图片数据
+            const fullData = new Uint8Array(chunks.reduce((acc, chunk) => acc + chunk.length, 0))
+            let offset = 0
+            for (const chunk of chunks) {
+              fullData.set(chunk, offset)
+              offset += chunk.length
+            }
+            
+            console.log("📄 获取到图片数据，大小:", fullData.length, "bytes")
+            console.log("📄 文件头:", fullData.slice(0, 8))
+            
+            // 直接将二进制数据转换为 base64
+            const imageData = Buffer.from(fullData).toString('base64')
+            
+            console.log("✅ 图片数据转换为 base64 成功，长度:", imageData.length)
+
+            // 直接返回结果，不需要下载步骤
+            const processingTime = Date.now() - startTime
+            
+            return NextResponse.json({
+              success: true,
+              image: `data:image/png;base64,${imageData}`,
+              processingTime: `${processingTime}ms`,
+              model: "flux-kontext-pro",
+              attempt: attempt,
+              format: "ReadableStream"
+            })
+            
+          } finally {
+            reader.releaseLock()
+          }
+        } else if (output && output.url) {
+          // 如果是包含 url 属性的对象
+          imageUrl = typeof output.url === 'function' ? output.url() : output.url
+          console.log("📎 输出格式: URL 对象")
+        } else {
+          console.error("❌ 未知的输出格式:", output)
+          console.error("❌ 输出详细信息:", JSON.stringify(output, null, 2))
+          throw new Error(`不支持的输出格式: ${typeof output}, constructor: ${output?.constructor?.name}`)
         }
 
-        return NextResponse.json(
-          {
-            success: false,
-            error: `API调用失败: ${apiResponse.status} - ${responseText}`,
-            debug: {
-              status: apiResponse.status,
-              statusText: apiResponse.statusText,
-              responseText: responseText,
-              apiUrl: API_URL,
-              timestamp: new Date().toISOString(),
-            },
-          },
-          { status: apiResponse.status },
-        )
-      }
+        console.log("🔗 解析得到的图片 URL:", imageUrl)
 
-      // 尝试解析JSON
-      let apiResult
-      try {
-        apiResult = JSON.parse(responseText)
-        console.log("📦 API响应数据结构:", {
-          hasData: !!apiResult.data,
-          dataLength: apiResult.data?.length || 0,
-          keys: Object.keys(apiResult),
+        // 验证 URL 格式
+        if (!imageUrl || !imageUrl.startsWith('http')) {
+          throw new Error(`无效的图片 URL: ${imageUrl}`)
+        }
+
+        // 下载图片并转换为 base64
+        const imageResponse = await fetch(imageUrl)
+        if (!imageResponse.ok) {
+          throw new Error(`下载生成的图片失败: ${imageResponse.status} ${imageResponse.statusText}`)
+        }
+        
+        const imageBuffer = await imageResponse.arrayBuffer()
+        const imageData = Buffer.from(imageBuffer).toString('base64')
+
+        console.log("✅ 图片转换为 base64 成功，长度:", imageData.length)
+
+        // 如果成功，返回结果
+        const processingTime = Date.now() - startTime
+        
+        return NextResponse.json({
+          success: true,
+          image: `data:image/png;base64,${imageData}`,
+          processingTime: `${processingTime}ms`,
+          model: "flux-kontext-pro",
+          attempt: attempt
         })
-      } catch (parseError) {
-        console.error("❌ JSON解析失败:", parseError)
-        console.error("📄 无法解析的响应文本:", responseText)
 
-        return NextResponse.json(
-          {
-            success: false,
-            error: "API响应不是有效的JSON格式",
-            debug: {
-              parseError: parseError instanceof Error ? parseError.message : String(parseError),
-              responseText: responseText,
-              responseLength: responseText.length,
-              apiUrl: API_URL,
-              timestamp: new Date().toISOString(),
-            },
-          },
-          { status: 500 },
-        )
-      }
+      } catch (error: any) {
+        console.error(`❌ 第 ${attempt} 次尝试失败:`, error)
 
-      // 检查响应格式
-      if (!apiResult.data || !Array.isArray(apiResult.data) || apiResult.data.length === 0) {
-        console.error("❌ API响应格式错误:", apiResult)
-        return NextResponse.json(
-          {
-            success: false,
-            error: "API响应格式错误",
-            debug: {
-              apiResult,
-              expectedFormat: "data数组包含b64_json格式的图片",
-            },
-          },
-          { status: 500 },
-        )
-      }
+        if (attempt === maxRetries) {
+          console.error("❌ 图片生成最终失败:", error.message)
+          return NextResponse.json({ 
+            error: error.message || "图片生成失败",
+            model: "flux-kontext-pro",
+            attempts: maxRetries,
+            suggestion: error.message.includes('rate limit') ? '请稍后再试，API 调用频率限制' :
+                       error.message.includes('timeout') ? '请尝试使用更小的图片或降低质量' :
+                       error.message.includes('Unauthorized') || error.message.includes('authentication') ? 'API 认证失败，请检查配置' :
+                       error.message.includes('invalid') ? '请检查图片格式是否正确' : 
+                       '请检查网络连接或稍后重试'
+          }, { status: 500 })
+        }
 
-      // 提取base64图片数据
-      imageData = apiResult.data[0]
-      if (!imageData.b64_json) {
-        console.error("❌ 没有找到b64_json数据:", imageData)
-        return NextResponse.json(
-          {
-            success: false,
-            error: "没有找到图片数据",
-            debug: {
-              imageData,
-              availableKeys: Object.keys(imageData),
-            },
-          },
-          { status: 500 },
-        )
-      }
-
-      // 如果成功，跳出重试循环
-      break
-    } catch (error) {
-      lastError = error as Error
-      console.error(`❌ 第 ${attempt} 次尝试失败:`, error)
-
-      if (attempt < maxRetries) {
-        const delay = attempt * 5000 // 5秒, 10秒
+        // 等待后重试
+        const delay = baseDelay * attempt
         console.log(`⏳ 等待 ${delay}ms 后重试...`)
-        await new Promise((resolve) => setTimeout(resolve, delay))
+        await new Promise(resolve => setTimeout(resolve, delay))
       }
     }
+
+  } catch (error: any) {
+    console.error("❌ 请求处理失败:", error)
+    return NextResponse.json({ 
+      error: error.message || "请求处理失败",
+      suggestion: '请检查上传的图片格式是否正确'
+    }, { status: 500 })
   }
-
-  if (lastError) {
-    throw lastError
-  }
-
-  const processingTime = Date.now() - startTime
-  console.log(`✅ 图片生成成功，耗时: ${processingTime}ms`)
-
-  return NextResponse.json({
-    success: true,
-    image: imageData.b64_json,
-    processingTime,
-    debug: {
-      originalSize: image.size,
-      apiResponseTime: processingTime,
-      imageGenerated: true,
-    },
-  })
 }
