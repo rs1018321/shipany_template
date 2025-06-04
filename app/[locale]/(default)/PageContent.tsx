@@ -5,6 +5,7 @@ import { Upload, Wand2, Download, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
+import { AspectRatioSelector } from "@/components/ui/aspect-ratio-selector"
 
 import Branding from "@/components/blocks/branding";
 import CTA from "@/components/blocks/cta";
@@ -45,6 +46,24 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
   const [textGeneratedImage, setTextGeneratedImage] = useState<string | null>(null)
   const [isGeneratingText, setIsGeneratingText] = useState(false)
   const [textError, setTextError] = useState<string | null>(null)
+  
+  // 添加尺寸比例状态
+  const [imageAspectRatio, setImageAspectRatio] = useState<string>("2:3")
+  const [textAspectRatio, setTextAspectRatio] = useState<string>("2:3")
+
+  // 将比例转换为具体尺寸
+  const getImageSize = (aspectRatio: string): string => {
+    const baseSize = 1024
+    switch (aspectRatio) {
+      case "2:3":
+        return "832x1248" // 2:3 比例
+      case "3:2":
+        return "1248x832" // 3:2 比例
+      case "1:1":
+      default:
+        return "1024x1024" // 1:1 比例
+    }
+  }
 
   // 从localStorage加载历史记录
   const loadHistory = (): GenerationResult[] => {
@@ -62,11 +81,32 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
     try {
       const history = loadHistory()
       history.unshift(result)
-      // 只保留最近10个结果
-      const limitedHistory = history.slice(0, 10)
-      localStorage.setItem("coloring-book-history", JSON.stringify(limitedHistory))
+      // 只保留最近5个结果，减少存储占用
+      const limitedHistory = history.slice(0, 5)
+      
+      // 检查存储大小
+      const historyString = JSON.stringify(limitedHistory)
+      if (historyString.length > 1024 * 1024) { // 1MB限制
+        console.warn("历史记录过大，清理旧记录")
+        // 只保留最新的2个记录
+        const minimalHistory = limitedHistory.slice(0, 2)
+        localStorage.setItem("coloring-book-history", JSON.stringify(minimalHistory))
+      } else {
+        localStorage.setItem("coloring-book-history", historyString)
+      }
     } catch (error) {
       console.error("Failed to save to history:", error)
+      // 如果存储失败，尝试清理存储后重试
+      if (error instanceof Error && error.name === 'QuotaExceededError') {
+        try {
+          localStorage.removeItem("coloring-book-history")
+          const newHistory = [result]
+          localStorage.setItem("coloring-book-history", JSON.stringify(newHistory))
+          console.log("清理历史记录后重新保存成功")
+        } catch (retryError) {
+          console.error("重试保存也失败了:", retryError)
+        }
+      }
     }
   }
 
@@ -169,7 +209,7 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
       formData.append("n", "1")
       formData.append("quality", "auto")
       formData.append("response_format", "b64_json")
-      formData.append("size", "1024x1024")
+      formData.append("size", getImageSize(imageAspectRatio))
 
       setDebugInfo("正在调用API...")
 
@@ -252,12 +292,15 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
     }
     setIsGeneratingText(true)
     setTextError(null)
-    setDebugInfo("文字生成线稿中...")
+    setDebugInfo("文字生成线稿中，这可能需要2-4分钟，请耐心等待...")
     try {
       const response = await fetch("/api/generate-text-sketch", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: promptText }),
+        body: JSON.stringify({ 
+          prompt: promptText,
+          size: getImageSize(textAspectRatio)
+        }),
       })
       const result = await response.json()
       if (!response.ok) throw new Error(result.error || `API调用失败: ${response.status}`)
@@ -268,11 +311,13 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
           textImageData = base64Prefix + textImageData
         }
         setTextGeneratedImage(textImageData)
+        setDebugInfo(`文字生成成功! 耗时: ${Math.round(result.processingTime / 1000)}秒`)
       } else {
         throw new Error(result.error || "生成失败")
       }
     } catch (error) {
       setTextError(error instanceof Error ? error.message : String(error))
+      setDebugInfo("")
     } finally {
       setIsGeneratingText(false)
     }
@@ -304,6 +349,14 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
           )}
         </div>
         <input ref={fileInputRef} type="file" onChange={handleImageUpload} className="hidden" />
+        
+        {/* 添加尺寸选择器 */}
+        <AspectRatioSelector
+          value={imageAspectRatio}
+          onChange={setImageAspectRatio}
+          className="mt-4"
+        />
+        
         <Button onClick={generateColoringBook} disabled={!originalImage || isGenerating} className="w-full mt-4">
           {isGenerating ? (
             <><Loader2 className="w-4 h-4 animate-spin mr-2" />生成中...</>
@@ -311,6 +364,21 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
             <><Wand2 className="w-4 h-4 mr-2" />生成涂色图</>
           )}
         </Button>
+        
+        {/* 显示调试信息 */}
+        {debugInfo && !isGeneratingText && (
+          <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
+            {debugInfo}
+          </div>
+        )}
+        
+        {/* 显示错误信息 */}
+        {error && (
+          <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-sm text-red-800">
+            {error}
+          </div>
+        )}
+        
         {generatedImage && (
           <div className="mt-4 text-center">
             <img src={generatedImage} alt="线稿" className="rounded-lg shadow max-h-64 mx-auto" />
@@ -333,6 +401,14 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
           placeholder="例如：一个在海滩玩耍的小孩"
           className="mb-4 w-full aspect-[5/4]"
         />
+        
+        {/* 添加尺寸选择器 */}
+        <AspectRatioSelector
+          value={textAspectRatio}
+          onChange={setTextAspectRatio}
+          className="mb-4"
+        />
+        
         <Button onClick={generateFromText} disabled={!promptText.trim() || isGeneratingText} className="w-full">
           {isGeneratingText ? (
             <><Loader2 className="w-4 h-4 animate-spin mr-2" />生成中...</>
@@ -340,6 +416,21 @@ export default function LandingPage({ page, locale }: LandingPageProps) {
             <><Wand2 className="w-4 h-4 mr-2" />生成线稿图</>
           )}
         </Button>
+        
+        {/* 显示调试信息 */}
+        {debugInfo && (
+          <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
+            {debugInfo}
+          </div>
+        )}
+        
+        {/* 显示错误信息 */}
+        {textError && (
+          <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-sm text-red-800">
+            {textError}
+          </div>
+        )}
+        
         {textGeneratedImage && (
           <div className="mt-4 text-center">
             <img src={textGeneratedImage} alt="线稿图" className="rounded-lg shadow max-h-64 mx-auto" />

@@ -8,34 +8,33 @@ export async function POST(request: NextRequest) {
   const maxRetries = 2
   let lastError: Error | null = null
   let imageData: any // Declare imageData here
-  let imageFile!: File // 用于存储上传的原始文件
+
+  // 将 formData 读取移到重试循环外面，避免多次读取
+  const formData = await request.formData()
+  const image = formData.get("image") as File
+  const size = formData.get("size") as string || "1024x1024"
+  
+  if (!image) {
+    console.error("❌ 没有收到图片文件")
+    return NextResponse.json({ success: false, error: "没有收到图片文件" }, { status: 400 })
+  }
+
+  console.log(`📁 收到图片文件: ${image.name}, 大小: ${image.size} bytes, 输出尺寸: ${size}`)
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       console.log(`🔄 第 ${attempt} 次尝试调用API`)
-
       console.log("🚀 开始处理图片生成请求")
-
-      // 获取表单数据
-      const formData = await request.formData()
-      const image = formData.get("image") as File
-      imageFile = image
-      if (!imageFile) {
-        console.error("❌ 没有收到图片文件")
-        return NextResponse.json({ success: false, error: "没有收到图片文件" }, { status: 400 })
-      }
-
-      console.log(`📁 收到图片文件: ${image.name}, 大小: ${image.size} bytes`)
 
       // 创建新的FormData发送给API
       const apiFormData = new FormData()
-      apiFormData.append("image", imageFile)
+      apiFormData.append("image", image)
       apiFormData.append("prompt", "转换为黑白线稿涂色图，简洁的线条，适合儿童涂色")
       apiFormData.append("model", "gpt-image-1")
       apiFormData.append("n", "1")
       apiFormData.append("quality", "auto")
       apiFormData.append("response_format", "b64_json")
-      apiFormData.append("size", "1024x1024")
+      apiFormData.append("size", size)
 
       console.log("🌐 准备调用外部API:", API_URL)
 
@@ -185,7 +184,7 @@ export async function POST(request: NextRequest) {
     image: imageData.b64_json,
     processingTime,
     debug: {
-      originalSize: imageFile.size,
+      originalSize: image.size,
       apiResponseTime: processingTime,
       imageGenerated: true,
     },
