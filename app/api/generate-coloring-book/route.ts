@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     const input = {
       //image: imageDataUrl,
       input_image: imageDataUrl,  
-      prompt: "Convert this colored illustration into clean black-and-white coloring-book line art. Keep only the essential outlines of the main character and scene, drawing bold, continuous pure-black strokes. Remove all color, shading, gradients and fills, leaving crisp, simple contours. Background must stay pure white. Output as a high-resolution PNG",
+      prompt: "Convert this colored illustration into clean black-and-white coloring-book line art. CRITICAL REQUIREMENT: The ENTIRE original image must be preserved completely - DO NOT crop, cut, trim, or remove ANY portion of the original image. ALL elements from edge to edge of the original image must remain visible and intact. Create a larger canvas with the target aspect ratio and place the complete, unmodified original image in the center. Fill the extra space around the original image with pure white background. Think of this as putting a complete postcard into a larger picture frame - the postcard (original image) stays exactly the same size and shape, you just add a white border around it. Draw bold, continuous pure-black strokes for outlines only. Remove all color, shading, gradients and fills, leaving crisp, simple contours. Output as a high-resolution PNG.",
       guidance_scale: 2.5,
       num_inference_steps: 28,
       aspect_ratio: size === "1024x1024" ? "1:1" :     // 1:1 正方形
