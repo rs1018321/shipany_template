@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
 
   // 检查 API token
   if (!process.env.REPLICATE_API_TOKEN) {
-    console.error("❌ REPLICATE_API_TOKEN 环境变量未设置")
+    console.error("❌ REPLICATE_API_TOKEN 环境变量未进行设置")
     return NextResponse.json({ error: "API 配置错误，请联系管理员" }, { status: 500 })
   }
 
